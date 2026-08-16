@@ -3,23 +3,15 @@ from openmesha.kernel.capabilities import CapabilityRegistry
 from openmesha.kernel.memory import MemoryStore
 
 def register_builtins(registry: CapabilityRegistry, memory: MemoryStore) -> dict:
-    registry.register("web_search", "Search the open web (mock)")
-    registry.register("memory_read", "Read from agent memory")
-    registry.register("memory_write", "Write to agent memory")
-    registry.register("code_exec", "Execute sandboxed code (mock)")
-
-    def web_search(q: str) -> str:
-        return f"[mock search] results for: {q}"
-
-    def memory_read(key: str) -> str:
-        return memory.read(key) or ""
-
-    def memory_write(key: str, value: str) -> str:
-        memory.write(key, value)
-        return "ok"
-
-    return {
-        "web_search": web_search,
-        "memory_read": memory_read,
-        "memory_write": memory_write,
+    tools = {
+        "web_search": lambda q: f"[mock search] results for: {q}",
+        "memory_read": lambda k: memory.read(k) or "",
+        "memory_write": lambda k, v="": (memory.write(k, v), "ok")[1],
+        "security_scan": lambda t: {"verdict": "blocked" if "ignore previous" in t.lower() else "clean"},
+        "route_decide": lambda: {"model": "mock-gpt", "policy": "thompson"},
+        "compute_quote": lambda hrs=10: {"spot": hrs * 1.9, "on_demand": hrs * 4.9},
     }
+    for name, fn in tools.items():
+        registry.register(name, description=f"builtin:{name}")
+    registry.register("payment", description="x402 payment capability — HOTL gated")
+    return tools

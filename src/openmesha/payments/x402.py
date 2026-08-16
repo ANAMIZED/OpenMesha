@@ -1,19 +1,20 @@
 from __future__ import annotations
-from dataclasses import dataclass
-
-@dataclass
-class Quote:
-    amount_usd: float
-    currency: str = "USDC"
-    chain: str = "base"
-    sim: bool = True
+from typing import Any
 
 PAYWALLS = {
-    "web_search": 0.001,
-    "code_exec": 0.005,
-    "outcome_fee": 0.05,
+    "route.decide": 0.01,
+    "security.scan": 0.04,
+    "compute.quote": 0.02,
+    "council.deliberate": 0.25,
 }
 
-def quote(service: str) -> Quote:
-    amt = PAYWALLS.get(service, 0.01)
-    return Quote(amount_usd=amt, sim=True)
+def quote(service: str) -> dict[str, Any] | None:
+    if service not in PAYWALLS:
+        return None
+    return {"service": service, "amount_usd": PAYWALLS[service], "asset": "USDC", "network": "base", "sim": True}
+
+def settle_sim(service: str) -> dict[str, Any]:
+    q = quote(service)
+    if not q:
+        return {"ok": False, "error": "no paywall"}
+    return {"ok": True, "tx": {**q, "status": "simulated"}, "sim": True}

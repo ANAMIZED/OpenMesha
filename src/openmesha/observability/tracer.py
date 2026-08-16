@@ -1,23 +1,20 @@
 from __future__ import annotations
+from typing import Any
 from collections import defaultdict
-from datetime import datetime, timezone
 
 class Tracer:
     def __init__(self) -> None:
-        self._events: list[dict] = []
-        self._counters: dict[str, int] = defaultdict(int)
+        self._metrics: dict[str, float] = defaultdict(float)
+        self._traces: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
-    def record(self, agent_id: str, kind: str, message: str, extra: dict | None = None) -> None:
-        self._events.append({
-            "ts": datetime.now(timezone.utc).isoformat(),
-            "agent_id": agent_id,
-            "kind": kind,
-            "message": message,
-            "extra": extra or {},
-        })
+    def inc(self, key: str, n: float = 1.0) -> None:
+        self._metrics[key] += n
 
-    def inc(self, name: str, n: int = 1) -> None:
-        self._counters[name] += n
+    def record(self, agent_id: str, kind: str, msg: str, data: dict | None = None) -> None:
+        self._traces[agent_id].append({"kind": kind, "msg": msg, "data": data or {}})
 
-    def metrics(self) -> dict:
-        return dict(self._counters)
+    def dump_metrics(self) -> dict[str, float]:
+        return dict(self._metrics)
+
+    def agent_traces(self, agent_id: str) -> list[dict[str, Any]]:
+        return list(self._traces.get(agent_id, []))

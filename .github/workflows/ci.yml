@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Required files present
+        run: |
+          test -f README.md
+          test -f LICENSE
+          test -f AGENTS.md
+          test -f scripts/publish-web.sh
+          test -f index.html
+      - name: HTML well-formed enough to parse
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for p in [Path("index.html")]:
+              if not p.exists():
+                  continue
+              t = p.read_text(encoding="utf-8", errors="replace")
+              assert "<html" in t.lower() and "</html>" in t.lower(), p
+          print("ok")
+          PY

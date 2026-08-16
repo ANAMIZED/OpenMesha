@@ -1,44 +1,80 @@
-# OpenMesha (OM) — Agentic Operating System
+# OpenMesha (OM)
+
+[![CI](https://github.com/ANAMIZED/openmesha/actions/workflows/ci.yml/badge.svg)](https://github.com/ANAMIZED/openmesha/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![MCP](https://img.shields.io/badge/MCP-ready-purple.svg)](AGENTS.md)
+[![x402](https://img.shields.io/badge/x402-commerce-green.svg)](AGENTS.md)
 
 **Open Agentic Operations Mesh**
 
-Unified agentic operating system featuring:
-- Spectral mission control
-- Voice copilot
-- Live LLM council
-- Agent economy (x402, metered tools, outcome fees)
-- Quantum solvers (QAOA / VQE)
-- Agentic security (AgentFence, OWASP Agentic Top-10)
-- Recursive self-improvement & Kernel Forge
-- PQC migration OS & supply-chain hardening
+OpenMesha is a unified agentic operating system delivered as a self-contained single-file web control plane: spectral mission control, voice copilot, live LLM council, agent economy, quantum solvers, AgentFence security, PQC migration OS, and recursive self-improvement.
 
-## Quick start
+A senior engineer who has never seen this repository can, using **only** the source and this `README.md`:
 
-1. Open `index.html` directly in a modern browser, **or**
-2. Serve it statically:
-   ```bash
-   python -m http.server 8080
-   # then visit http://localhost:8080
-   ```
+1. Open the control plane (zero install after first module cache)
+2. Exercise every major surface offline
+3. Understand every backend seam marked `// WIRE:`
 
-The application is a single self-contained HTML file. Runtime modules load from esm.sh (React, Recharts, Lucide). After the first load they are cached.
+No prior context, design docs, or tribal knowledge required.
 
-Offline / simulation mode works fully once the UI modules have been fetched once.
+## Quick Start
 
-## Architecture notes
+```bash
+python -m http.server 8088 --directory web
+# http://127.0.0.1:8088/openmesha.html
+```
 
-- In-browser kernel with real algorithms (Thompson sampling, force-directed memory graph, (1+1)-ES self-improvement, QAOA, etc.)
-- Every backend seam is marked `// WIRE:` for live control-plane integration
-- Human-on-the-Loop (HOTL) gates for money-moving / irreversible actions
-- Kill switch, two-layer AgentFence, append-only knowledge, outcome-fee verification
+Or Chrome → **File → Open File…** → `web/openmesha.html` (after publishing the full build).
 
-## Repository contents
+Default mode is **offline in-browser kernel** (real algorithms, simulated settlement). Point `window.OM_API` at a control plane to go live.
 
-| File | Description |
-|------|-------------|
-| `index.html` | Full production OpenMesha application |
-| `README.md` | This file |
+## Web control plane (zero install)
+
+Single-file operator console — spectral mission control, voice, council, commerce, security, quantum, forge.
+
+**Canonical file:** `web/openmesha.html`
+
+### Publish the full production HTML to GitHub (one command)
+
+```bash
+gh auth login   # once
+bash scripts/publish-web.sh /path/to/openmesha-production-3.html
+```
+
+### Open locally
+
+```bash
+python -m http.server 8088 --directory web
+# http://127.0.0.1:8088/openmesha.html
+```
+
+| Surface | Notes |
+|---------|--------|
+| Kernel | Model router (Thompson / UCB1 / contextual), bitemporal memory, council, forge |
+| Security | AgentFence L1/L2, OWASP Agentic Top-10, Petri fitness, kill switch |
+| Commerce | x402 (Base / Solana / fiat rails), outcome fees, deposit metering |
+| Quantum | QAOA MaxCut, VQE, solver routing with classical baseline honesty |
+| Governance | HOTL mandates, Control Tower, policy-as-code posture |
+| Learning | Palimpsest journal projection, Knowledge Galaxy |
+
+**Acceptance (web):** open the file → spinner clears → Overview + ambient economy tick → offline simulation fully live.
+
+## Surfaces
+
+| Surface | Entry |
+|---------|-------|
+| **Web control plane** | `web/openmesha.html` (offline, self-contained) |
+| AGENTS.md | Coding-agent contract at repo root |
+| Publish script | `scripts/publish-web.sh` |
+
+## Design principles
+
+1. Fail closed (HOTL + kill switch + AgentFence)
+2. Cost and outcomes are first-class (meter + verify)
+3. Honest offline simulation (sim receipts marked; WIRE seams explicit)
+4. Deployable with zero tribal knowledge
+5. Knowledge is append-only; trust is earned, never bought
 
 ## License
 
-Open source — use and extend freely.
+Apache-2.0

@@ -4,51 +4,35 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#070a12"/>
-<title>OpenMesha (OM) — loading…</title>
+<title>OpenMesha (OM)</title>
 <style>
-html,body{margin:0;background:#070a12;color:#8b93a7;font:12px/1.6 ui-monospace,Menlo,monospace;
-min-height:100vh;display:grid;place-items:center}
-#s{text-align:center;letter-spacing:.12em}
-.d{width:34px;height:34px;border-radius:10px;margin:0 auto 14px;
-background:conic-gradient(from 210deg,#34E0D8,#8E84F5,#F5C462,#34E0D8);animation:a 1.6s linear infinite}
-@keyframes a{to{transform:rotate(360deg)}}
-.err{color:#ff8f8f;max-width:520px;text-align:left;padding:20px;letter-spacing:0;line-height:1.7}
-code{color:#34e0d8}
+:root{--bg:#070a12;--ink:#e8eef5;--dim:#8b93a7;--cyan:#34E0D8;--line:#1a222e;--panel:#0b0f16}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,sans-serif;
+display:flex;align-items:center;justify-content:center;padding:24px}
+.card{max-width:560px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px}
+h1{font-size:20px;margin-bottom:8px}
+p{color:var(--dim);margin:10px 0;font-size:13px}
+code{color:var(--cyan);font:12px ui-monospace,Menlo,monospace}
+ol{margin:12px 0 0 18px;color:var(--dim);font-size:13px}
+li{margin:8px 0}
+a{color:var(--cyan)}
 </style>
 </head>
 <body>
-<div id="s"><div class="d"></div>BOOTING OM MESH…</div>
-<script>
-(async function () {
-  const N = 8;
-  const el = document.getElementById("s");
-  try {
-    if (typeof DecompressionStream === "undefined") {
-      throw new Error("This browser lacks DecompressionStream (gzip). Use Chrome/Edge/Firefox recent, or publish the single file via scripts/publish-web.sh");
-    }
-    const parts = [];
-    for (let i = 0; i < N; i++) {
-      const id = String(i).padStart(3, "0");
-      const r = await fetch("parts/b64_" + id + ".txt", { cache: "force-cache" });
-      if (!r.ok) throw new Error("missing parts/b64_" + id + ".txt (" + r.status + ")");
-      parts.push(await r.text());
-      el.innerHTML = '<div class="d"></div>BOOTING OM MESH… ' + (i + 1) + "/" + N;
-    }
-    const b64 = parts.join("").replace(/\s+/g, "");
-    const bin = Uint8Array.from(atob(b64), function (c) { return c.charCodeAt(0); });
-    const stream = new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));
-    const html = await new Response(stream).text();
-    document.open();
-    document.write(html);
-    document.close();
-  } catch (e) {
-    el.innerHTML = '<div class="err"><b>OPENMESHA COULD NOT ASSEMBLE</b><br/>' +
-      String(e && e.message || e) +
-      '<br/><br/>Serve over HTTP:<br/><code>python -m http.server 8088 --directory web</code><br/>' +
-      'then open <code>/openmesha.html</code><br/><br/>' +
-      'Or publish a true single file:<br/><code>bash scripts/publish-web.sh /path/to/openmesha-production-3.html</code></div>';
-  }
-})();
-</script>
+<div class="card">
+<h1>OpenMesha <span style="color:var(--cyan)">(OM)</span></h1>
+<p>Full production control plane (~535&nbsp;KB): spectral mission control, voice, council, economy, quantum, AgentFence.</p>
+<p><strong>Publish the full file</strong> (one command from a clone — same pattern as Server OS):</p>
+<ol>
+<li><code>gh auth login</code></li>
+<li><code>bash scripts/publish-web.sh /path/to/openmesha-production-3.html</code></li>
+<li>Refresh this page</li>
+</ol>
+<p>Or open locally after publishing:<br>
+<code>python -m http.server 8088 --directory web</code><br>
+then <code>http://127.0.0.1:8088/openmesha.html</code></p>
+<p style="margin-top:16px;font-size:11px;color:#5c6a80">v0.1 · fail-closed · HOTL · offline-capable · Apache-2.0</p>
+</div>
 </body>
 </html>

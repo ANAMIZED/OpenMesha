@@ -2,78 +2,76 @@
 
 [![CI](https://github.com/ANAMIZED/openmesha/actions/workflows/ci.yml/badge.svg)](https://github.com/ANAMIZED/openmesha/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![MCP](https://img.shields.io/badge/MCP-ready-purple.svg)](AGENTS.md)
-[![x402](https://img.shields.io/badge/x402-commerce-green.svg)](AGENTS.md)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![MCP](https://img.shields.io/badge/MCP-server-purple.svg)](src/openmesha/mcp/)
+[![x402](https://img.shields.io/badge/x402-commerce-green.svg)](src/openmesha/payments/)
 
 **Open Agentic Operations Mesh**
 
-OpenMesha is a unified agentic operating system delivered as a self-contained single-file web control plane: spectral mission control, voice copilot, live LLM council, agent economy, quantum solvers, AgentFence security, PQC migration OS, and recursive self-improvement.
+OpenMesha is a production-oriented agentic operating system: an in-browser kernel (Thompson router, bitemporal memory, QAOA/VQE, AgentFence, x402, HOTL, PQC) delivered as a self-contained web control plane, plus a Python control plane with OS-like primitives — agents as processes, budgets, multi-agent workflows, MCP, SDK, and CLI.
 
 A senior engineer who has never seen this repository can, using **only** the source and this `README.md`:
 
-1. Open the control plane (zero install after first module cache)
-2. Exercise every major surface offline
-3. Understand every backend seam marked `// WIRE:`
+1. Deploy the entire system (single command)
+2. Exercise every major feature
+3. Verify end-to-end correctness via automated checks
 
-No prior context, design docs, or tribal knowledge required.
+## Quick Start (Python control plane)
 
-## Quick Start
+```bash
+docker compose up --build
+# another terminal
+bash scripts/verify.sh
+```
+
+- API: http://localhost:8080
+- Health: http://localhost:8080/health
+- OpenAPI: http://localhost:8080/docs
+
+Default mode is **offline mock LLM** (deterministic, free).
+
+## Quick Start (Web control plane)
 
 ```bash
 python -m http.server 8088 --directory web
-# http://127.0.0.1:8088/openmesha.html
+# open http://127.0.0.1:8088/openmesha.html
 ```
 
-Or Chrome → **File → Open File…** → `web/openmesha.html` (after publishing the full build).
-
-Default mode is **offline in-browser kernel** (real algorithms, simulated settlement). Point `window.OM_API` at a control plane to go live.
-
-## Web control plane (zero install)
-
-Single-file operator console — spectral mission control, voice, council, commerce, security, quantum, forge.
-
-**Canonical file:** `web/openmesha.html`
-
-### Publish the full production HTML to GitHub (one command)
+The loader fetches `web/parts/b64_*.txt` (gzip+base64 of the ~535 KB production build), decompresses in-browser via `DecompressionStream`, and boots the full mesh. Or publish a true single-file:
 
 ```bash
 gh auth login   # once
 bash scripts/publish-web.sh /path/to/openmesha-production-3.html
 ```
 
-### Open locally
-
-```bash
-python -m http.server 8088 --directory web
-# http://127.0.0.1:8088/openmesha.html
-```
-
-| Surface | Notes |
-|---------|--------|
-| Kernel | Model router (Thompson / UCB1 / contextual), bitemporal memory, council, forge |
-| Security | AgentFence L1/L2, OWASP Agentic Top-10, Petri fitness, kill switch |
-| Commerce | x402 (Base / Solana / fiat rails), outcome fees, deposit metering |
-| Quantum | QAOA MaxCut, VQE, solver routing with classical baseline honesty |
-| Governance | HOTL mandates, Control Tower, policy-as-code posture |
-| Learning | Palimpsest journal projection, Knowledge Galaxy |
-
-**Acceptance (web):** open the file → spinner clears → Overview + ambient economy tick → offline simulation fully live.
-
 ## Surfaces
 
 | Surface | Entry |
 |---------|-------|
-| **Web control plane** | `web/openmesha.html` (offline, self-contained) |
+| **Web control plane** | `web/openmesha.html` (runtime loader + parts, or published single file) |
+| REST API | `openmesha-api` / `python -c "from openmesha.main import run; run()"` |
+| CLI | `openmesha status` / `openmesha agents ...` / `openmesha workflow` |
+| MCP Server | `openmesha-mcp` |
+| SDK | `from openmesha.sdk import OpenMeshaClient` |
+| Skills | `skills/*/SKILL.md` (agentfence, x402-payments, multi-agent-workflow, cost-control, governance-hotl) |
+| Multi-agent workflows | `POST /v1/workflows` · MCP `create_workflow` · CLI |
 | AGENTS.md | Coding-agent contract at repo root |
-| Publish script | `scripts/publish-web.sh` |
+
+## Verify contract
+
+```bash
+bash scripts/verify.sh
+```
+
+Covers API, cost, governance, AgentFence, multi-agent workflows, SDK, CLI, MCP, skills, and AGENTS.md (15 checks).
 
 ## Design principles
 
-1. Fail closed (HOTL + kill switch + AgentFence)
-2. Cost and outcomes are first-class (meter + verify)
-3. Honest offline simulation (sim receipts marked; WIRE seams explicit)
-4. Deployable with zero tribal knowledge
-5. Knowledge is append-only; trust is earned, never bought
+1. Least privilege by construction (capabilities from intent)
+2. Cost is a first-class resource
+3. Fail closed (AgentFence + HOTL)
+4. Honest offline simulation (`sim` receipts; WIRE seams explicit)
+5. Deployable with zero tribal knowledge
 
 ## License
 

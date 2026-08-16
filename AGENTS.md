@@ -4,34 +4,45 @@ This file is the contract for any AI coding agent working on this repository.
 
 ## What this project is
 
-OpenMesha is an Open Agentic Operations Mesh — a unified agentic operating system delivered as a self-contained single-file web control plane (spectral mission control, voice copilot, live LLM council, agent economy, quantum solvers, AgentFence security, PQC migration OS, and x402 commerce).
+OpenMesha is an Open Agentic Operations Mesh: a unified agentic operating system with
+(1) an in-browser kernel (spectral mission control, Thompson/UCB router, bitemporal memory graph, QAOA/VQE, AgentFence, x402 metering, HOTL, PQC) delivered as a self-contained single-file web control plane, and
+(2) a Python control-plane package providing REST API, CLI, SDK, MCP server, multi-agent workflows, cost control, governance, and skills.
 
-A senior engineer with only the source and `README.md` must be able to open the app, exercise every major surface, and understand every WIRE seam.
+A senior engineer with only the source and `README.md` must be able to deploy it, exercise every surface, and verify end-to-end via `scripts/verify.sh`.
 
 ## How to run & verify
 
 ```bash
-# Local (zero install after first module cache)
+# Python control plane
+docker compose up --build
+# another terminal
+bash scripts/verify.sh
+
+# Web control plane (after parts or publish)
 python -m http.server 8088 --directory web
 # open http://127.0.0.1:8088/openmesha.html
-
-# Or Chrome → File → Open File… → web/openmesha.html
 ```
 
-Acceptance: app boots past the mesh spinner, Overview renders, ambient economy ticks, and the in-browser kernel runs real algorithms (no external control plane required for offline simulation).
+Unit tests: `PYTHONPATH=src pytest -q`
 
 ## Hard rules for agents
 
-1. Never weaken HOTL, kill switch, AgentFence (two-layer), append-only knowledge, or outcome-fee verification.
-2. Fail closed. Money-moving / irreversible actions escalate to human approval.
-3. Every backend integration is marked `// WIRE:` — do not pretend live settlement when offline.
-4. Sim receipts stay marked `sim:true`. Outcome fees only settle where the kernel verifiably controls the result.
-5. Prefer small, focused changes. Update README.md and AGENTS.md when public surfaces change.
-6. Do not introduce ambient authority or silent network side-effects on the default offline path.
+1. Never break the verify contract (`scripts/verify.sh` must stay green).
+2. Fail closed — AgentFence + HOTL stay hard; never weaken kill-switch or escalation.
+3. Capabilities only — no ambient authority.
+4. Cost is first-class — meter before every LLM call; respect budgets.
+5. Keep the mock LLM deterministic; no external network on the default/mock path.
+6. Outcome fees / money-moving paths remain HOTL-gated; sim receipts stay marked `sim:true`.
+7. Prefer small, focused changes. Update README.md and AGENTS.md when public surfaces change.
+8. Web WIRE seams stay explicit; offline path must remain fully functional.
 
 ## Surfaces that must stay working
 
-- Single-file web control plane (`web/openmesha.html`)
-- In-browser kernel (router, memory, council, security, commerce, quantum, forge)
-- Voice console, command palette, Knowledge Galaxy / Palimpsest projection
-- Publish script: `scripts/publish-web.sh`
+- REST API (`/health`, `/v1/agents`, `/v1/workflows`, `/v1/cost/ledger`, `/v1/audit`, `/metrics`)
+- CLI (`openmesha status`, `openmesha agents …`, `openmesha workflow`)
+- MCP Server (`openmesha-mcp` + tool registry: create_agent, run_task, create_workflow, x402_payment_quote, …)
+- SDK (`from openmesha.sdk import OpenMeshaClient`)
+- Skills (`skills/agentfence`, `x402-payments`, `multi-agent-workflow`, `cost-control`, `governance-hotl`)
+- Multi-agent workflows (planner/researcher style under shared budget)
+- Web control plane (`web/openmesha.html` + `web/parts/b64_*.txt` loader or published single file)
+- `scripts/verify.sh` (15-check contract)

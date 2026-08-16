@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OpenMesha (OM) — publish full build</title>
+<style>
+  html,body{margin:0;background:#070a12;color:#e8eef5;font:14px/1.6 system-ui,sans-serif;
+  display:grid;place-items:center;min-height:100vh;padding:24px;text-align:center}
+  a{color:#34e0d8} code{font:12px ui-monospace,Menlo,monospace;color:#93a2b6}
+  .box{max-width:520px;border:1px solid #1a222e;border-radius:14px;padding:28px;background:#0b0f16}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1 style="margin:0 0 8px;font-size:22px">OpenMesha (OM)</h1>
+  <p style="color:#93a2b6;margin:0 0 18px">Open Agentic Operations Mesh</p>
+  <p>The full production single-file control plane has not been published to this path yet.</p>
+  <p style="text-align:left;font-size:13px;color:#c7cede">
+    From a machine with the production HTML and GitHub CLI:
+  </p>
+  <pre style="text-align:left;background:#0f141d;padding:12px;border-radius:10px;overflow:auto;font:12px ui-monospace,Menlo,monospace">gh auth login
+bash scripts/publish-web.sh /path/to/openmesha-production-3.html</pre>
+  <p style="margin-top:18px;font-size:12px;color:#5c6a80">
+    Mirrors the Server OS <code>scripts/publish-web-control-plane.sh</code> pattern.
+  </p>
+  <p><a href="../README.md">README</a> · <a href="../AGENTS.md">AGENTS.md</a></p>
+</div>
+</body>
+</html>

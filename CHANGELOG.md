@@ -4,9 +4,11 @@
 
 ### Added
 
-- Single-file OpenMesha production control plane (spectral mission control, voice, council, economy)
-- In-browser kernel with real algorithms (Thompson routing, bitemporal memory, QAOA/VQE, forge, AgentFence)
-- x402 commerce + outcome layer (sim-honest offline)
-- PQC migration OS, supply-chain signing patterns, QPU mount seams
-- AGENTS.md contract, publish-web script, GitHub templates
-- Apache-2.0 licensing and standard community files
+- Python control plane: FastAPI REST API, CLI, SDK, MCP server
+- Agent processes with budgets, capabilities, AgentFence policy
+- Multi-agent workflows under shared budget
+- Cost ledger + audit log
+- Five SKILL.md packages (agentfence, x402, multi-agent, cost, governance)
+- scripts/verify.sh end-to-end contract
+- Docker Compose deploy
+- Web control plane publish path (scripts/publish-web.sh)

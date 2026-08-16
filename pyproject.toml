@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openmesha"
+version = "0.1.0"
+description = "OpenMesha — Open Agentic Operations Mesh"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [{name = "OpenMesha Contributors"}]
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "httpx>=0.27.0",
+    "python-multipart>=0.0.12",
+    "structlog>=24.4.0",
+    "typer>=0.12.0",
+    "rich>=13.9.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3.0", "pytest-asyncio>=0.24.0"]
+mcp = ["mcp>=1.0.0"]
+
+[project.scripts]
+openmesha = "openmesha.cli:app"
+openmesha-api = "openmesha.main:run"
+openmesha-mcp = "openmesha.mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

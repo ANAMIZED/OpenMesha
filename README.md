@@ -4,6 +4,9 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![MCP](https://img.shields.io/badge/MCP-server-purple.svg)](src/openmesha/mcp/)
+[![SDK](https://img.shields.io/badge/SDK-Python-green.svg)](src/openmesha/sdk/)
+[![CLI](https://img.shields.io/badge/CLI-openmesha-orange.svg)](src/openmesha/cli.py)
+[![API](https://img.shields.io/badge/API-FastAPI-009688.svg)](src/openmesha/api/)
 [![x402](https://img.shields.io/badge/x402-commerce-green.svg)](src/openmesha/payments/)
 
 **Open Agentic Operations Mesh**
@@ -28,61 +31,36 @@ A senior engineer who has never seen this repository can, using **only** the sou
 
 *Related:* [rui](https://github.com/ANAMIZED/rui) · [server-os](https://github.com/ANAMIZED/server-os) · [LRSI](https://github.com/ANAMIZED/LRSI) · [OpenGOS](https://github.com/ANAMIZED/OpenGOS)
 
-## Quick Start (Python control plane)
-
-```bash
-docker compose up --build
-# another terminal
-bash scripts/verify.sh
-```
-
-- API: http://localhost:8080
-- Health: http://localhost:8080/health
-- OpenAPI: http://localhost:8080/docs
-
-Default mode is **offline mock LLM** (deterministic, free).
-
-## Quick Start (Web control plane)
-
-```bash
-python -m http.server 8088 --directory web
-# open http://127.0.0.1:8088/openmesha.html
-```
-
-The loader fetches `web/parts/b64_*.txt` (gzip+base64 of the ~535 KB production build), decompresses in-browser via `DecompressionStream`, and boots the full mesh. Or publish a true single-file:
-
-```bash
-gh auth login   # once
-bash scripts/publish-web.sh /path/to/openmesha-production-3.html
-```
-
 ## Surfaces
 
 | Surface | Entry |
 |---------|-------|
-| **Web control plane** | `web/openmesha.html` (runtime loader + parts, or published single file) |
+| **Web control plane** | `web/openmesha.html` |
 | REST API | `openmesha-api` / `python -c "from openmesha.main import run; run()"` |
 | CLI | `openmesha status` / `openmesha agents ...` / `openmesha workflow` |
 | MCP Server | `openmesha-mcp` |
 | SDK | `from openmesha.sdk import OpenMeshaClient` |
-| Skills | `skills/*/SKILL.md` (agentfence, x402-payments, multi-agent-workflow, cost-control, governance-hotl) |
-| Multi-agent workflows | `POST /v1/workflows` · MCP `create_workflow` · CLI |
+| Multi-agent workflows | `POST /v1/workflows` · MCP · CLI · `skills/multi-agent-workflow/` |
+| Skills | `skills/*/SKILL.md` |
+| CI | `.github/workflows/ci.yml` |
 | AGENTS.md | Coding-agent contract at repo root |
 
-## Verify contract
+## Quick Start
 
 ```bash
+docker compose up --build
 bash scripts/verify.sh
 ```
 
-Covers API, cost, governance, AgentFence, multi-agent workflows, SDK, CLI, MCP, skills, and AGENTS.md (15 checks).
+- API: http://localhost:8080
+- OpenAPI: http://localhost:8080/docs
 
 ## Design principles
 
-1. Least privilege by construction (capabilities from intent)
+1. Least privilege by construction
 2. Cost is a first-class resource
 3. Fail closed (AgentFence + HOTL)
-4. Honest offline simulation (`sim` receipts; WIRE seams explicit)
+4. Honest offline simulation
 5. Deployable with zero tribal knowledge
 
 ## License

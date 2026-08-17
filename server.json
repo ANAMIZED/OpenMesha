@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.ANAMIZED/openmesha",
+  "description": "OpenMesha — Open Agentic Operations Mesh MCP server. Agents, workflows, cost, governance, x402.",
+  "repository": {
+    "url": "https://github.com/ANAMIZED/openmesha",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "openmesha",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

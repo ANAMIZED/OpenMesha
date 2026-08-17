@@ -16,9 +16,7 @@ A senior engineer who has never seen this repository can, using **only** the sou
 2. Exercise every major feature
 3. Verify end-to-end correctness via automated checks
 
-**[Support Public Goods](https://donate.stripe.com/test_28E8wP60D9pC9hf1flbAs00)** · **[Support Agentic OS Kernels ($99)](https://buy.stripe.com/test_3cI6oH74HgS4fFDe27bAs02)**
-
-*Test-mode links.*
+**[Support Public Goods](https://donate.stripe.com/00w5kE3wOg5L8Jn2F243S00)** · **[Support Agentic OS Kernels ($99)](https://buy.stripe.com/bJecN63wObPv6Bf7Zm43S02)**
 
 ## Quick Start (Python control plane)
 

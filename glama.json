@@ -1,0 +1,8 @@
+{
+  "name": "openmesha",
+  "displayName": "OpenMesha",
+  "description": "Open Agentic Operations Mesh — unified agentic OS with MCP, cost control, governance, x402, and multi-agent workflows.",
+  "repository": "https://github.com/ANAMIZED/openmesha",
+  "license": "Apache-2.0",
+  "version": "0.1.0"
+}

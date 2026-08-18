@@ -9,9 +9,9 @@
 [![API](https://img.shields.io/badge/API-FastAPI-009688.svg)](src/openmesha/api/)
 [![x402](https://img.shields.io/badge/x402-commerce-green.svg)](src/openmesha/payments/)
 
-**Open Agentic Operations Mesh**
+**“Autonomous Local Economic System”**
 
-OpenMesha is a production-oriented agentic operating system: an in-browser kernel (Thompson router, bitemporal memory, QAOA/VQE, AgentFence, x402, HOTL, PQC) delivered as a self-contained web control plane, plus a Python control plane with OS-like primitives — agents as processes, budgets, multi-agent workflows, MCP, SDK, and CLI.
+OpenMesha is a production-oriented agentic operating system: Super kernel (Thompson router, bitemporal memory, QAOA/VQE, AgentFence, x402, HOTL, PQC) delivered as a self-contained web control plane, plus a Python control plane with OS-like primitives — agents as processes, budgets, multi-agent workflows, MCP, SDK, and CLI.
 
 A senior engineer who has never seen this repository can, using **only** the source and this `README.md`:
 

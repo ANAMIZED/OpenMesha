@@ -1,6 +1,6 @@
 # OpenMesha (OM)
 
-[![CI](https://github.com/ANAMIZED/openmesha/actions/workflows/ci.yml/badge.svg)](https://github.com/ANAMIZED/openmesha/actions/workflows/ci.yml)
+[![CI](https://github.com/ANAMIZED/OpenMesha/actions/workflows/ci.yml/badge.svg)](https://github.com/ANAMIZED/OpenMesha/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![MCP](https://img.shields.io/badge/MCP-server-purple.svg)](src/openmesha/mcp/)
@@ -10,6 +10,16 @@
 [![x402](https://img.shields.io/badge/x402-commerce-green.svg)](src/openmesha/payments/)
 
 **“Autonomous Local Economic System”**
+
+## 🚀 Live Demo
+
+[![Live Demo](https://img.shields.io/badge/%F0%9F%9A%80%20Live%20Demo-OpenMesha%20Briefing-blue?style=for-the-badge)](https://anamized.github.io/OpenMesha/OpenMesha-Briefing.html)
+
+**Interactive 14-chapter systems briefing** — kernel, agents, economy, security, quantum, x402, HOTL, and more.
+
+→ [Open the live interactive demo](https://anamized.github.io/OpenMesha/OpenMesha-Briefing.html)
+
+---
 
 OpenMesha is a production-oriented agentic operating system: Super kernel (Thompson router, bitemporal memory, QAOA/VQE, AgentFence, x402, HOTL, PQC) delivered as a self-contained web control plane, plus a Python control plane with OS-like primitives — agents as processes, budgets, multi-agent workflows, MCP, SDK, and CLI.
 
@@ -35,7 +45,8 @@ A senior engineer who has never seen this repository can, using **only** the sou
 
 | Surface | Entry |
 |---------|-------|
-| **Web control plane** | `web/openmesha.html` |
+| **Live Demo (GitHub Pages)** | [OpenMesha-Briefing.html](https://anamized.github.io/OpenMesha/OpenMesha-Briefing.html) |
+| **Web control plane** | [`web/openmesha.html`](web/openmesha.html) |
 | REST API | `openmesha-api` / `python -c "from openmesha.main import run; run()"` |
 | CLI | `openmesha status` / `openmesha agents ...` / `openmesha workflow` |
 | MCP Server | `openmesha-mcp` |

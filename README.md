@@ -44,7 +44,7 @@ A senior engineer who has never seen this repository can, using **only** the sou
 | Skills | `skills/*/SKILL.md` |
 | CI | `.github/workflows/ci.yml` |
 | AGENTS.md | Coding-agent contract at repo root |
-| **WIRE production path** | [`docs/WIRE.md`](docs/WIRE.md) — hardware, topology, P0–P4 checklists |
+| **WIRE production path** | [`docs/WIRE.md`](docs/WIRE.md) — full cloud/self-hosted path: architecture, om-ctl API, stack, Foundry economics, settlement, P0–P4 checklists |
 
 ## Quick Start
 

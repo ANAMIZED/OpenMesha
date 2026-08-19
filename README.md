@@ -13,11 +13,11 @@
 
 ## 🚀 Live Demo
 
-[![Live Demo](https://img.shields.io/badge/%F0%9F%9A%80%20Live%20Demo-OpenMesha%20Briefing-blue?style=for-the-badge)](https://anamized.github.io/OpenMesha/OpenMesha-Briefing.html)
+[![Live Demo](https://img.shields.io/badge/%F0%9F%9A%80%20Live%20Demo-OpenMesha%20Briefing-blue?style=for-the-badge)](https://anamized.github.io/OpenMesha/OpenMesha-Briefing-SingleFile.html)
 
-**Interactive 14-chapter systems briefing** — kernel, agents, economy, security, quantum, x402, HOTL, and more.
+**Interactive 14-chapter systems briefing** (fully self-contained single file) — kernel, agents, economy, security, quantum, x402, HOTL, and more.
 
-→ [Open the live interactive demo](https://anamized.github.io/OpenMesha/OpenMesha-Briefing.html)
+→ [Open the live interactive demo](https://anamized.github.io/OpenMesha/OpenMesha-Briefing-SingleFile.html)
 
 ---
 
@@ -45,7 +45,7 @@ A senior engineer who has never seen this repository can, using **only** the sou
 
 | Surface | Entry |
 |---------|-------|
-| **Live Demo (GitHub Pages)** | [OpenMesha-Briefing.html](https://anamized.github.io/OpenMesha/OpenMesha-Briefing.html) |
+| **Live Demo (GitHub Pages)** | [OpenMesha-Briefing-SingleFile.html](https://anamized.github.io/OpenMesha/OpenMesha-Briefing-SingleFile.html) |
 | **Web control plane** | [`web/openmesha.html`](web/openmesha.html) |
 | REST API | `openmesha-api` / `python -c "from openmesha.main import run; run()"` |
 | CLI | `openmesha status` / `openmesha agents ...` / `openmesha workflow` |

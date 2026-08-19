@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05080f">
+<title>OpenMesha — Systems Briefing</title>
+<style>
+  :root {
+    --bg: #05080f;
+    --bg2: #0a101c;
+    --surface: #0f172a;
+    --border: #1e293b;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --cyan: #22d3ee;
+    --cyan-dim: #0891b2;
+    --magenta: #e879f9;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --radius: 12px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 100%;
+    position: relative;
+  }
+
+  /* Ambient canvas */
+  #mesh-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 8px;
+    background: linear-gradient(to bottom, rgba(5,8,15,0.95), transparent);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--cyan), var(--magenta));
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 14px; color: #05080f;
+  }
+  .logo-text { font-weight: 700; font-size: 15px; letter-spacing: -0.02em; }
+  .logo-sub { font-size: 11px; color: var(--muted); }
+  .header-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: rgba(15,23,42,0.7);
+    color: var(--text);
+    display: grid; place-items: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .icon-btn:active { transform: scale(0.92); }
+
+  /* Main stage */
+  main {
+    flex: 1;
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0 16px;
+  }
+
+  .chapter-meta {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .chapter-group {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--cyan);
+    font-weight: 600;
+  }
+  .chapter-title {
+    font-size: clamp(22px, 5.5vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 4px 0 2px;
+    line-height: 1.15;
+  }
+  .chapter-runtime {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .visual-stage {
+    flex: 1;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 8px 0;
+  }
+  .kernel-ring {
+    width: min(70vw, 220px);
+    height: min(70vw, 220px);
+    border-radius: 50%;
+    border: 2px solid rgba(34,211,238,0.25);
+    position: relative;
+    display: grid;
+    place-items: center;
+    animation: pulse-ring 4s ease-in-out infinite;
+  }
+  .kernel-ring::before {
+    content: '';
+    position: absolute;
+    inset: 18%;
+    border-radius: 50%;
+    border: 1px solid rgba(232,121,249,0.3);
+  }
+  .kernel-core {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--cyan), #0e7490);
+    box-shadow: 0 0 40px rgba(34,211,238,0.5);
+    display: grid; place-items: center;
+    font-size: 11px; font-weight: 700; color: #05080f;
+    letter-spacing: -0.02em;
+  }
+  @keyframes pulse-ring {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.04); opacity: 0.85; }
+  }
+  .orbit {
+    position: absolute;
+    width: 100%; height: 100%;
+    animation: spin 28s linear infinite;
+  }
+  .orbit.rev { animation-direction: reverse; animation-duration: 36s; }
+  .node {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+    top: 0; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .node:nth-child(2) { background: var(--magenta); box-shadow: 0 0 10px var(--magenta); top: 50%; left: 100%; }
+  .node:nth-child(3) { background: var(--green); box-shadow: 0 0 10px var(--green); top: 100%; left: 50%; }
+  .node:nth-child(4) { background: var(--amber); box-shadow: 0 0 10px var(--amber); top: 50%; left: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .narration-box {
+    background: rgba(15,23,42,0.75);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    max-height: 28vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 12px;
+  }
+  .narration-text {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .narration-text .highlight {
+    color: var(--cyan);
+    font-weight: 500;
+  }
+
+  /* Subsystem chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    justify-content: center;
+  }
+  .chip {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(34,211,238,0.12);
+    border: 1px solid rgba(34,211,238,0.25);
+    color: var(--cyan);
+  }
+
+  /* Player controls */
+  .player {
+    position: relative;
+    z-index: 20;
+    background: linear-gradient(to top, rgba(5,8,15,0.98) 60%, transparent);
+    padding: 8px 16px calc(16px + var(--safe-bottom));
+  }
+  .progress-wrap {
+    margin-bottom: 12px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    touch-action: none;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    border-radius: 3px;
+    transition: width 0.15s linear;
+  }
+  .progress-chapters {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .ch-marker {
+    position: absolute;
+    top: -2px;
+    width: 2px;
+    height: 10px;
+    background: rgba(255,255,255,0.35);
+  }
+  .time-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  .ctrl-btn {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 20px;
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .ctrl-btn.play {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--cyan), var(--cyan-dim));
+    color: #05080f;
+    font-size: 26px;
+    box-shadow: 0 4px 24px rgba(34,211,238,0.35);
+  }
+  .ctrl-btn:active { transform: scale(0.9); }
+
+  /* Chapter drawer */
+  .drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-height: 70vh;
+    background: var(--bg2);
+    border-radius: 20px 20px 0 0;
+    z-index: 50;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: var(--safe-bottom);
+  }
+  .drawer.open { transform: translateY(0); }
+  .drawer-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 10px auto 8px;
+  }
+  .drawer-title {
+    font-size: 16px; font-weight: 600;
+    padding: 0 20px 12px;
+  }
+  .chapter-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 0 12px 20px;
+  }
+  .ch-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .ch-item:active, .ch-item.active {
+    background: rgba(34,211,238,0.1);
+  }
+  .ch-num {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--surface);
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 700;
+    color: var(--muted);
+  }
+  .ch-item.active .ch-num {
+    background: var(--cyan);
+    color: #05080f;
+  }
+  .ch-info { flex: 1; min-width: 0; }
+  .ch-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ch-group { font-size: 11px; color: var(--muted); }
+  .ch-time { font-size: 12px; color: var(--muted); }
+
+  /* Info / explore sheet */
+  .info-sheet {
+    position: fixed; inset: 0;
+    z-index: 60;
+    background: var(--bg);
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32,0.72,0,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .info-sheet.open { transform: translateY(0); }
+  .info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .inv-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .inv-card h3 { font-size: 14px; margin-bottom: 6px; color: var(--cyan); }
+  .inv-card p { font-size: 13px; color: var(--muted); line-height: 1.45; }
+  .sub-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .sub-table th, .sub-table td {
+    text-align: left; padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sub-table th { color: var(--muted); font-weight: 500; }
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(34,211,238,0.15);
+    color: var(--cyan);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 100px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 100;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Loading */
+  #boot {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  #boot.hidden { display: none; }
+  .boot-logo {
+    width: 72px; height: 72px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--cyan), var(--magenta));
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 28px; color: #05080f;
+    animation: pulse-ring 2s ease-in-out infinite;
+  }
+  .boot-text { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="boot">
+  <div class="boot-logo">OM</div>
+  <div class="boot-text">Loading OpenMesha Briefing…</div>
+</div>
+
+<div id="app" style="display:none">
+  <canvas id="mesh-canvas"></canvas>
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">OM</div>
+      <div>
+        <div class="logo-text">OpenMesha</div>
+        <div class="logo-sub">Systems Briefing · 14 chapters</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="btn-info" title="Invariants & Catalog">ⓘ</button>
+      <button class="icon-btn" id="btn-chapters" title="Chapters">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="chapter-meta">
+      <div class="chapter-group" id="ch-group">Overture</div>
+      <div class="chapter-title" id="ch-title">OpenMesha</div>
+      <div class="chapter-runtime" id="ch-runtime">0:13 · Chapter 00 of 14</div>
+    </div>
+
+    <div class="visual-stage">
+      <div class="kernel-ring">
+        <div class="orbit">
+          <div class="node"></div>
+          <div class="node"></div>
+          <div class="node"></div>
+          <div class="node"></div>
+        </div>
+        <div class="orbit rev">
+          <div class="node" style="width:7px;height:7px;opacity:0.7"></div>
+          <div class="node" style="width:7px;height:7px;opacity:0.7;top:50%;left:100%"></div>
+        </div>
+        <div class="kernel-core">KERNEL</div>
+      </div>
+    </div>
+
+    <div class="chips" id="chips"></div>
+
+    <div class="narration-box">
+      <div class="narration-text" id="narration">Loading…</div>
+    </div>
+  </main>
+
+  <div class="player">
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+        <div class="progress-chapters" id="progress-markers"></div>
+      </div>
+      <div class="time-row">
+        <span id="time-cur">0:00</span>
+        <span id="time-total">10:23</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" id="btn-prev" title="Previous">⏮</button>
+      <button class="ctrl-btn play" id="btn-play" title="Play">▶</button>
+      <button class="ctrl-btn" id="btn-next" title="Next">⏭</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chapter drawer -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-title">Chapters</div>
+  <div class="chapter-list" id="chapter-list"></div>
+</div>
+
+<!-- Info sheet -->
+<div class="info-sheet" id="info-sheet">
+  <div class="info-header">
+    <div style="font-weight:600">OpenMesha · Doctrine & Catalog</div>
+    <button class="icon-btn" id="btn-close-info">✕</button>
+  </div>
+  <div class="info-body" id="info-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<audio id="audio" preload="auto" playsinline></audio>
+
+<script>
+const CHAPTERS = [
+  {
+    "id": "00",
+    "title": "OpenMesha",
+    "group": "Overture",
+    "runtime": "0:13",
+    "narration": "This is OpenMesha. An open agentic operations mesh. Spectral mission control. A voice copilot. A live model council. And a sovereign agent economy — running as one kernel.",
+    "start": 0,
+    "end": 13.416,
+    "chips": ["Operations Mesh", "Voice Copilot", "Agent Economy"]
+  },
+  {
+    "id": "01",
+    "title": "The five invariants",
+    "group": "Doctrine",
+    "runtime": "0:45",
+    "narration": "OpenMesha is the unification of two ideas. OpenHarness — spectral mission control and canvas engines. And QMesha — voice copilot, quantum solvers, and the agent economy. Together they form an autonomous local economic system: agents that plan, remember, route, compute, defend, and settle — while money never moves without a human. Five invariants are law. Money moves only with human approval. Knowledge is append-only. Outcome fees settle only where the kernel can verify the result. Local inference is unmetered. And governance is sold as a subscription, never per-use. Simulation receipts stay marked as simulation. The mesh will not fake a live settlement.",
+    "start": 13.416,
+    "end": 60.192,
+    "chips": ["HOTL", "Append-only Knowledge", "Outcome Honesty", "Unmetered Local", "Subscription Governance"]
+  },
+  {
+    "id": "02",
+    "title": "One source of truth",
+    "group": "Kernel",
+    "runtime": "0:40",
+    "narration": "At the center sits one unified kernel. Every subsystem — router, memory, council, compute, security, commerce, quantum — reads and writes the same source of truth. The algorithms are real: Thompson sampling, force-directed graphs, evolution strategies, QAOA, AgentFence. Where the browser cannot touch live infrastructure, a WIRE seam is labeled honestly: LiteLLM, Mem0, LangGraph, Coinbase x402, Qiskit MCP. Offline, the kernel simulates every path with the same contracts. A kill switch, declared first, can freeze settlement and ambient ticks in one motion.",
+    "start": 60.192,
+    "end": 104.88,
+    "chips": ["createKernel()", "WIRE Seams", "Kill Switch"]
+  },
+  {
+    "id": "03",
+    "title": "Mission control",
+    "group": "Operate",
+    "runtime": "0:28",
+    "narration": "Operations is three panes. Overview is mission control: treasury, revenue today, arbitrage saved, routed requests, pending approvals, mesh health. Console is the live activity stream — every route, scan, booking, and settlement as it happens. Tracing follows a request across the mesh, the observability seam that wires to OpenTelemetry gen-ai conventions. One question before any log: is the mesh healthy, earning, and safe?",
+    "start": 104.88,
+    "end": 135.336,
+    "chips": ["Overview", "Console", "Tracing", "OTel"]
+  },
+  {
+    "id": "04",
+    "title": "The Foundry",
+    "group": "Foundry",
+    "runtime": "0:42",
+    "narration": "The Foundry turns one operator prompt into a sibling metacognitive agentic operating system. The kernel classifies the domain — compliance, post-quantum, research, revenue operations, or support — then composes invariants, kernel slots, metered tools, outcome fees, eight console pages, and a packaging kit. It self-verifies the blueprint: outcomes sit inside paywalls, governance is complete, metacognition is present. Deploy is irreversible, so it always pauses on Human-on-the-Loop. Three commercial tiers: a five-dollar outcome when the kit passes its own battery; a deployment contract; and a two-and-a-half percent share of sibling settlement.",
+    "start": 135.336,
+    "end": 181.872,
+    "chips": ["Domain Kits", "Self-Verify", "$5 / $25k–$250k / 2.5%"]
+  },
+  {
+    "id": "05",
+    "title": "Router, memory, galaxy",
+    "group": "Intelligence",
+    "runtime": "0:52",
+    "narration": "Intelligence has three organs. The Model Router is a multi-armed bandit. Policies: Thompson sampling from a Beta posterior, UCB1, epsilon-greedy, or a contextual blend of quality and request features. Arms include frontier and local models. The reward mixes quality with cost, so traffic flows to whatever is winning per dollar. Agentic Memory is a temporal knowledge graph — episodic, semantic, procedural, working, and entity nodes. Edges are bitemporal: they carry valid-at and invalid-at, and are never deleted. Cold nodes consolidate. Recall is token-cheap compared with stuffing the full graph into context. The Knowledge Galaxy projects the wiki as a constellation. Palimpsest lessons and WIRE adoption pages become stars. Color is cluster. Menu and galaxy stay aligned.",
+    "start": 181.872,
+    "end": 238.32,
+    "chips": ["Thompson / UCB1", "Bitemporal Graph", "Knowledge Galaxy"]
+  },
+  {
+    "id": "06",
+    "title": "Orchestrator, council, swarm",
+    "group": "Agents",
+    "runtime": "0:45",
+    "narration": "The Orchestrator decomposes a goal into retrieve, route, draft, execute, critique, and reflect. Roles carry weights: Meta, Planner, Router, Coder, Critic, Memory, Tooling. The Council is plural. Six seats — Strategist, Risk, Market, Tech, Ethics, Finance — vote with declared weights. Consensus is a weighted probability, not a majority shout. Palimpsest can inject verified priors and a propose-only weight advisory before the vote. Swarm spawn fans work across A2A agents. Atlas-research, Vela-quant, Numina-sec — each provisioned with a reachability triad: a wallet, an inbox, and a phone. Identity, realtime, and settlement. Trust is scored, not assumed.",
+    "start": 238.32,
+    "end": 288.936,
+    "chips": ["Orchestrator", "6-Seat Council", "Reachability Triad"]
+  },
+  {
+    "id": "07",
+    "title": "Self-improvement & Palimpsest",
+    "group": "Learning",
+    "runtime": "0:43",
+    "narration": "Self-improvement is a one-plus-one evolution strategy with the one-fifth success rule. The incumbent is perturbed by Gaussian noise. Strictly better candidates are kept. Sigma widens when more than twenty percent of the last ten trials succeed, and shrinks otherwise. Recursive Knowledge Ingestion hashes every source — council transcripts, wiki pages, tool output — into an immutable ledger. Synthesis proposes a wiki diff. It does not silently overwrite. Palimpsest is the persistent skill journal. Lessons carry status, trust, and decay. The copilot consults them before answering. Writes are capture and signal only. Nothing self-promotes. Trust has no price.",
+    "start": 288.936,
+    "end": 335.232,
+    "chips": ["(1+1)-ES", "RKI Ledger", "Palimpsest"]
+  },
+  {
+    "id": "08",
+    "title": "Arbitrage, forge, quantum",
+    "group": "Compute",
+    "runtime": "0:51",
+    "narration": "Compute Arbitrage quotes GPU hours across Akash, io.net, Vast, Lambda, and Spheron. Effective price is spot times a reliability penalty. The kernel books the cheapest feasible SKU — H100, A100, L40S, or 4090 — and stacks the savings against on-demand list. Kernel Forge generates GPU kernels: draft, compile, verify numerics, profile, and bank only verified wins. Outcome fees settle only when a kernel is numerically correct and at least one-point-two times faster than PyTorch eager. Agentic Quantum routes MaxCut instances across greedy, simulated annealing, and a simulated QPU. The quantum premium settles only when the quantum solver beats the best classical baseline on the same instance. Honesty is the scoreboard. Sometimes classical holds.",
+    "start": 335.232,
+    "end": 391.68,
+    "chips": ["GPU Spot Arbitrage", "Kernel Forge", "QAOA / VQE"]
+  },
+  {
+    "id": "09",
+    "title": "AgentFence & HOTL",
+    "group": "Security",
+    "runtime": "0:47",
+    "narration": "AgentFence is two layers. Layer one screens every inbound message and tool output before it enters context. Flagged content is wrapped as untrusted data, never as instructions. Layer two gates what the agent may do next. Anything irreversible or money-moving escalates to Human-on-the-Loop. The posture map is the OWASP Agentic Top Ten: prompt injection, tool misuse, excessive agency, memory poisoning, identity spoofing, supply chain, cascading failure, exfiltration, goal manipulation, insecure output. A Petri seed battery scores fitness. A seven-dimension Production Readiness Score rolls security live and the rest as audited self-assessment. The Control Tower kill switch is hard.",
+    "start": 391.68,
+    "end": 441.168,
+    "chips": ["AgentFence L1/L2", "HOTL", "OWASP ASI-10", "PRS"]
+  },
+  {
+    "id": "10",
+    "title": "PQC Migration OS",
+    "group": "Security",
+    "runtime": "0:51",
+    "narration": "The Post-Quantum Migration OS inventories every primitive in a cryptographic bill of materials. x402 signatures, AP2 mandates, agent identity, skill signing, and TLS key exchange are classed vulnerable. Receipt hashes are Grover-ok. Mosca's inequality asks whether migration time plus data shelf-life exceeds the arrival of a cryptographically relevant quantum computer. If the margin is negative, the row is urgent. Deadlines sit on the rail: FIPS 140-2 historical, CNSA 2.0, NIST IR 8547. An in-tab ML-DSA-65 signer can hybrid-sign mandates and skills. The pqc.migrate outcome fee settles only on a kernel-controlled row, and only after the hybrid signer is loaded and self-verified.",
+    "start": 441.168,
+    "end": 496.968,
+    "chips": ["CBOM", "Mosca Inequality", "ML-DSA-65"]
+  },
+  {
+    "id": "11",
+    "title": "MCP, markets, discovery",
+    "group": "Gateway",
+    "runtime": "0:42",
+    "narration": "The MCP Gateway lists metered tools and packaged skills. Each call can raise an x402 invoice: route.decide at a cent, council.deliberate at a quarter, quantum.qaoa at fifty cents. A free tier exists on purpose — directories rank availability. Marketplaces are the distribution surface: AWS outcome-native, Apify pay-per-result, enterprise stores, and free MCP directories. Discovery publishes an A2A agent card and well-known identity. Supply-chain hardening signs skills, pins dependencies, and scans upstream mounts for injection and SSRF. Unsigned skills cannot republish.",
+    "start": 496.968,
+    "end": 543.744,
+    "chips": ["MCP Gateway", "Marketplaces", "A2A Discovery", "Supply Chain"]
+  },
+  {
+    "id": "12",
+    "title": "x402, treasury, outcomes",
+    "group": "Economy",
+    "runtime": "0:48",
+    "narration": "Commerce is a pricing layer cake: base, usage, and outcome. x402 settles USDC on Base as primary, Solana as secondary volume rail, and Stripe as the enterprise fiat adapter. One ledger. No second books. A deposit plus off-chain receipts nets into batches, so sub-dollar calls do not die on gas. Outcome fees — audit.certify, foundry.deploy, hardening.improve, pqc.migrate — settle only when the kernel verifies the criterion. Missed outcomes charge nothing. Treasury holds buckets and a four-and-a-half percent policy yield. Revenue and the VC pipeline sit beside it. The voice copilot can propose a payment. Approval — a tap — is the second factor. Always.",
+    "start": 543.744,
+    "end": 595.944,
+    "chips": ["x402 USDC", "Batch Netting", "Treasury 4.5%", "HOTL Payments"]
+  },
+  {
+    "id": "13",
+    "title": "Voice, WIRE, close",
+    "group": "System",
+    "runtime": "0:25",
+    "narration": "WIRE is how the label becomes infrastructure: Coolify, Sandboxd, microVMs, a control plane that holds every key. The browser is observe-only. OpenMesha is not a chatbot with a wallet bolted on. It is an autonomous local economic system with a human on the loop, append-only knowledge, and honest settlement. One kernel. Every subsystem. The mesh is live.",
+    "start": 595.944,
+    "end": 623.28,
+    "chips": ["Voice Copilot", "WIRE Control Plane", "Observe-only Browser"]
+  }
+];
+
+const TOTAL = 623.28;
+let currentIdx = 0;
+let isPlaying = false;
+let audioReady = false;
+
+const audio = document.getElementById('audio');
+const $ = (id) => document.getElementById(id);
+
+function fmt(t) {
+  t = Math.max(0, Math.floor(t));
+  const m = Math.floor(t / 60);
+  const s = t % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+function setChapter(idx, seek = true) {
+  currentIdx = Math.max(0, Math.min(CHAPTERS.length - 1, idx));
+  const ch = CHAPTERS[currentIdx];
+  $('ch-group').textContent = ch.group;
+  $('ch-title').textContent = ch.title;
+  $('ch-runtime').textContent = ch.runtime + ' · Chapter ' + ch.id + ' of 14';
+  $('narration').textContent = ch.narration;
+  const chipsEl = $('chips');
+  chipsEl.innerHTML = (ch.chips || []).map(c => `<span class="chip">${c}</span>`).join('');
+  // update list active
+  document.querySelectorAll('.ch-item').forEach((el, i) => {
+    el.classList.toggle('active', i === currentIdx);
+  });
+  if (seek && audioReady) {
+    audio.currentTime = ch.start + 0.05;
+  }
+}
+
+function updateProgress() {
+  if (!audioReady) return;
+  const t = audio.currentTime;
+  const pct = (t / TOTAL) * 100;
+  $('progress-fill').style.width = pct + '%';
+  $('time-cur').textContent = fmt(t);
+  // auto chapter
+  let idx = currentIdx;
+  for (let i = 0; i < CHAPTERS.length; i++) {
+    if (t >= CHAPTERS[i].start && t < CHAPTERS[i].end) {
+      idx = i;
+      break;
+    }
+  }
+  if (idx !== currentIdx) setChapter(idx, false);
+}
+
+function togglePlay() {
+  if (!audioReady) {
+    toast('Audio still loading…');
+    return;
+  }
+  if (isPlaying) {
+    audio.pause();
+  } else {
+    audio.play().catch(e => {
+      toast('Tap again to start audio');
+      console.warn(e);
+    });
+  }
+}
+
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Build chapter list + markers
+function buildUI() {
+  const list = $('chapter-list');
+  list.innerHTML = CHAPTERS.map((ch, i) => `
+    <div class="ch-item ${i===0?'active':''}" data-idx="${i}">
+      <div class="ch-num">${ch.id}</div>
+      <div class="ch-info">
+        <div class="ch-name">${ch.title}</div>
+        <div class="ch-group">${ch.group}</div>
+      </div>
+      <div class="ch-time">${ch.runtime}</div>
+    </div>
+  `).join('');
+  list.querySelectorAll('.ch-item').forEach(el => {
+    el.addEventListener('click', () => {
+      setChapter(+el.dataset.idx, true);
+      closeDrawer();
+      if (!isPlaying) togglePlay();
+    });
+  });
+
+  const markers = $('progress-markers');
+  markers.innerHTML = CHAPTERS.map(ch => {
+    const left = (ch.start / TOTAL) * 100;
+    return `<div class="ch-marker" style="left:${left}%"></div>`;
+  }).join('');
+
+  // Info body
+  $('info-body').innerHTML = `
+    <div class="inv-card">
+      <h3>The Five Invariants</h3>
+      <p>1. Money moves only with human approval (HOTL).<br>
+      2. Knowledge is append-only — edges retire, never deleted.<br>
+      3. Outcome fees settle only where the kernel can verify the criterion.<br>
+      4. Local inference is unmetered.<br>
+      5. Governance is sold as a subscription, never per-use.</p>
+    </div>
+    <div class="inv-card">
+      <h3>Safety Floor</h3>
+      <p>AgentFence L1 (scanIngest) · AgentFence L2 (actGate) · Human-on-the-Loop · hard kill switch · OWASP Agentic Top Ten · Petri + PRS · PQC Migration OS.</p>
+    </div>
+    <div class="inv-card">
+      <h3>Settlement</h3>
+      <p>x402 USDC (Base primary, Solana secondary, Stripe fiat adapter). Deposit + batch netting for sub-dollar calls. One ledger. No second books. Simulation receipts stay marked <span class="badge">sim:true</span>.</p>
+    </div>
+    <div class="inv-card">
+      <h3>46 Subsystems · 14 Chapters · 9:31+ narration</h3>
+      <p>This interactive briefing is the written companion to the 14-chapter film pack. All algorithms (Thompson sampling, (1+1)-ES, QAOA, force-directed graphs, etc.) are real contracts inside the unified kernel.</p>
+    </div>
+    <div class="inv-card">
+      <h3>Closing line</h3>
+      <p><em>OpenMesha is not a chatbot with a wallet bolted on. It is an autonomous local economic system with a human on the loop, append-only knowledge, and honest settlement. One kernel. Every subsystem. The mesh is live.</em></p>
+    </div>
+  `;
+}
+
+// Events
+$('btn-play').addEventListener('click', togglePlay);
+$('btn-prev').addEventListener('click', () => setChapter(currentIdx - 1));
+$('btn-next').addEventListener('click', () => setChapter(currentIdx + 1));
+$('btn-chapters').addEventListener('click', () => {
+  $('drawer').classList.add('open');
+  $('drawer-overlay').classList.add('open');
+});
+$('drawer-overlay').addEventListener('click', closeDrawer);
+function closeDrawer() {
+  $('drawer').classList.remove('open');
+  $('drawer-overlay').classList.remove('open');
+}
+$('btn-info').addEventListener('click', () => $('info-sheet').classList.add('open'));
+$('btn-close-info').addEventListener('click', () => $('info-sheet').classList.remove('open'));
+
+// Progress scrub
+let scrubbing = false;
+const bar = $('progress-bar');
+function scrub(e) {
+  const rect = bar.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  if (audioReady) audio.currentTime = pct * TOTAL;
+}
+bar.addEventListener('mousedown', (e) => { scrubbing = true; scrub(e); });
+bar.addEventListener('touchstart', (e) => { scrubbing = true; scrub(e); }, {passive:true});
+window.addEventListener('mousemove', (e) => { if (scrubbing) scrub(e); });
+window.addEventListener('touchmove', (e) => { if (scrubbing) scrub(e); }, {passive:true});
+window.addEventListener('mouseup', () => scrubbing = false);
+window.addEventListener('touchend', () => scrubbing = false);
+
+audio.addEventListener('timeupdate', updateProgress);
+audio.addEventListener('play', () => {
+  isPlaying = true;
+  $('btn-play').textContent = '⏸';
+});
+audio.addEventListener('pause', () => {
+  isPlaying = false;
+  $('btn-play').textContent = '▶';
+});
+audio.addEventListener('ended', () => {
+  isPlaying = false;
+  $('btn-play').textContent = '▶';
+  toast('Briefing complete · The mesh is live');
+});
+
+// Ambient mesh canvas
+function initCanvas() {
+  const canvas = $('mesh-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize() {
+    w = canvas.width = window.innerWidth * devicePixelRatio;
+    h = canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+  }
+  function spawn() {
+    particles = [];
+    const n = Math.min(60, Math.floor(window.innerWidth / 12));
+    for (let i = 0; i < n; i++) {
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.5 + 0.5
+      });
+    }
+  }
+  function frame() {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.fillStyle = 'rgba(34,211,238,0.6)';
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > window.innerWidth) p.vx *= -1;
+      if (p.y < 0 || p.y > window.innerHeight) p.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    // links
+    ctx.strokeStyle = 'rgba(34,211,238,0.08)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const a = particles[i], b = particles[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 120) {
+          ctx.globalAlpha = 1 - d / 120;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  resize(); spawn(); frame();
+  window.addEventListener('resize', () => { resize(); spawn(); });
+}
+
+// Boot: load audio (relative path preferred; falls back to data URI if present)
+function boot() {
+  buildUI();
+  setChapter(0, false);
+  $('time-total').textContent = fmt(TOTAL);
+  initCanvas();
+
+  // Prefer external file for smaller HTML; if not found, try embedded
+  const srcs = [
+    'audio/full_narration_64k.mp3',
+    './full_narration_64k.mp3',
+    'full_narration_64k.mp3'
+  ];
+  let tried = 0;
+  function tryNext() {
+    if (tried >= srcs.length) {
+      // last resort: look for data attribute or fail gracefully
+      $('boot').querySelector('.boot-text').textContent = 'Audio not found. Place full_narration_64k.mp3 next to this HTML.';
+      toast('Place the MP3 next to the HTML file');
+      document.getElementById('app').style.display = 'flex';
+      $('boot').classList.add('hidden');
+      return;
+    }
+    audio.src = srcs[tried++];
+    audio.load();
+  }
+  audio.addEventListener('canplaythrough', () => {
+    audioReady = true;
+    document.getElementById('app').style.display = 'flex';
+    $('boot').classList.add('hidden');
+  }, { once: true });
+  audio.addEventListener('error', () => tryNext());
+  tryNext();
+}
+
+boot();
+</script>
+</body>
+</html>

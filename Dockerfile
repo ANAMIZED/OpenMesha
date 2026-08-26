@@ -8,5 +8,6 @@ RUN mkdir -p /app/data
 ENV OM_DATA_DIR=/app/data
 ENV OM_LLM_MODE=mock
 ENV PYTHONUNBUFFERED=1
-EXPOSE 8080
-CMD ["python", "-c", "from openmesha.main import run; run()"]
+
+# Glama scores the MCP stdio surface, not the HTTP control plane.
+CMD ["openmesha-mcp"]

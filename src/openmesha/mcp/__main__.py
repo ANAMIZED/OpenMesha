@@ -1,11 +1,6 @@
-"""python -m openmesha.mcp — Glama stdio entry."""
+"""python -m openmesha.mcp — Glama / stdio entry."""
 
-from openmesha.mcp.server import mcp
-
-
-def main() -> None:
-    mcp.run(transport="stdio")
-
+from openmesha.mcp.server import main
 
 if __name__ == "__main__":
     main()

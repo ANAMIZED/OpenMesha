@@ -218,6 +218,21 @@ def x402_payment_quote(
     return q or {"error": "no paywall for service", "service": service}
 
 
+# Catalog used by unit tests and agent contracts. FastMCP wraps the callables
+# but the names must stay stable for CI collection.
+MCP_TOOLS = {
+    "list_agents": list_agents,
+    "create_agent": create_agent,
+    "run_task": run_task,
+    "get_cost_ledger": get_cost_ledger,
+    "get_audit_log": get_audit_log,
+    "get_metrics": get_metrics,
+    "create_workflow": create_workflow,
+    "list_available_tools": list_available_tools,
+    "x402_payment_quote": x402_payment_quote,
+}
+
+
 def main() -> None:
     mcp.run(transport="stdio")
 
